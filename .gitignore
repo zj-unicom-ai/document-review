@@ -1,0 +1,61 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+build/
+dist/
+*.egg-info/
+*.egg
+.eggs/
+pip-wheel-metadata/
+
+# Virtual env
+.venv/
+venv/
+env/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Test / coverage
+.pytest_cache/
+.playwright-cli/
+.coverage
+.coverage.*
+htmlcov/
+coverage.xml
+.mypy_cache/
+.ruff_cache/
+
+# Env / secrets
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+
+# Local data（仅根目录运行数据）
+/data/
+storage/
+!storage/.gitkeep
+!storage/uploads/.gitkeep
+*.db
+*.sqlite
+*.sqlite3
+*.tsbuildinfo
+
+# Project runtime artifacts
+local.db
+examples/generated/
+
+# Logs
+logs/
+*.log
+
+# OS
+.DS_Store
+Thumbs.db

@@ -1,0 +1,26 @@
+{
+  "tenant_id": "replace-with-current-tenant-id",
+  "cases": [
+    {
+      "name": "fixed-form-smoke",
+      "run_id": 123456,
+      "expected_violations": [
+        {
+          "rule_code": "REPLACE-WITH-RULE-CODE",
+          "title": "必填字段缺失",
+          "content_contains": "字段名",
+          "page_idx": 2
+        }
+      ],
+      "expected_evidence": [
+        {
+          "concept": "replace-with-concept-code",
+          "found": true,
+          "quality": "exact"
+        }
+      ],
+      "allow_extra_violations": false,
+      "fail_on_skipped": true
+    }
+  ]
+}

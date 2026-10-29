@@ -1,0 +1,87 @@
+# Copyright (c) 2026 Document Review Contributors
+# SPDX-License-Identifier: MIT
+
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - uses: astral-sh/setup-uv@v5
+        with:
+          version: "0.12.13"
+      - name: 安装后端依赖
+        run: |
+          python -m pip install --upgrade pip
+          pip install --require-hashes -r requirements.lock
+          pip install --no-deps --no-build-isolation -e ./packages/core
+          pip install -e ".[dev,lint]"
+      - name: 后端测试
+        run: python -m pytest -q
+      - name: Python 静态检查
+        run: |
+          ruff check .
+          ruff format --check .
+      - name: Python 依赖锁复现
+        run: python scripts/compile_python_lock.py --check
+
+  frontend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - name: 安装前端依赖
+        run: npm ci
+      - name: 前端测试
+        run: npm run test -- --run
+      - name: 前端类型检查
+        run: npm run typecheck
+      - name: 前端构建
+        run: npm run build
+      - name: 前端依赖审计
+        run: npm audit --audit-level=high
+
+  deployment:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compose 配置校验
+        run: docker compose --env-file .env.docker.example config --quiet
+
+  release-assets:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: 当前目录发布资产检查
+        run: python scripts/check_release_assets.py .
+      - name: Git 历史发布资产检查
+        run: python scripts/check_release_assets.py --scan-history .

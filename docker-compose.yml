@@ -1,0 +1,137 @@
+# Copyright (c) 2026 Document Review Contributors
+# SPDX-License-Identifier: MIT
+
+services:
+  mysql:
+    image: mysql:8.4
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?请在 .env.docker 中设置 MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-document_review}
+      MYSQL_USER: ${MYSQL_USER:-document_review}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:?请在 .env.docker 中设置 MYSQL_PASSWORD}
+    volumes:
+      - mysql-data:/var/lib/mysql
+    ports:
+      - "${MYSQL_BIND_HOST:-127.0.0.1}:${MYSQL_PORT:-3306}:3306"
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p\"$$MYSQL_ROOT_PASSWORD\""]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command:
+      - redis-server
+      - --save
+      - "60"
+      - "1"
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      # 容器内必须监听全部接口才能被端口映射访问；宿主机暴露面由 ports 控制。
+      APP_HOST: ${APP_HOST:-0.0.0.0}
+      APP_ENV: ${APP_ENV:-production}
+      APP_DEBUG: ${APP_DEBUG:-false}
+      APP_LOG_LEVEL: ${APP_LOG_LEVEL:-INFO}
+      AUTH_SECRET_KEY: ${AUTH_SECRET_KEY:?请在 .env.docker 中设置 AUTH_SECRET_KEY}
+      AUTH_SESSION_TTL_SECONDS: ${AUTH_SESSION_TTL_SECONDS:-43200}
+      SUPERADMIN_INITIAL_PASSWORD: ${SUPERADMIN_INITIAL_PASSWORD:-Changeme@2026}
+      BOOTSTRAP_SUPERADMIN: ${BOOTSTRAP_SUPERADMIN:-true}
+      DB_HOST: ${DB_HOST:-mysql}
+      DB_PORT: ${DB_PORT:-3306}
+      DB_USER: ${DB_USER:-document_review}
+      DB_PASSWORD: ${MYSQL_PASSWORD:?请在 .env.docker 中设置 MYSQL_PASSWORD}
+      DB_NAME: ${DB_NAME:-document_review}
+      RUN_PLATFORM_SEED: ${RUN_PLATFORM_SEED:-true}
+      SEED_STANDARD_RULES: "false"
+      STORAGE_ROOT: ${STORAGE_ROOT:-/app/storage}
+      REDIS_HOST: ${REDIS_HOST:-redis}
+      REDIS_PORT: ${REDIS_PORT:-6379}
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-}
+      REDIS_DB: ${REDIS_DB:-0}
+      LLM_BASE_URL: ${LLM_BASE_URL:-}
+      LLM_API_KEY: ${LLM_API_KEY:-}
+      LLM_MODEL: ${LLM_MODEL:-}
+      LLM_VISION_MODEL: ${LLM_VISION_MODEL:-}
+      LLM_LIGHT_MODEL: ${LLM_LIGHT_MODEL:-}
+      LLM_REQUEST_TIMEOUT_S: ${LLM_REQUEST_TIMEOUT_S:-60}
+      LLM_MAX_CONCURRENCY: ${LLM_MAX_CONCURRENCY:-4}
+      LLM_PROFILE_DISCOVERY: ${LLM_PROFILE_DISCOVERY:-true}
+      MINERU_PRIVATE_API_SERVER: ${MINERU_PRIVATE_API_SERVER:-}
+      MINERU_PRIVATE_BACKEND: ${MINERU_PRIVATE_BACKEND:-hybrid-auto-engine}
+      MINERU_TIMEOUT_SECONDS: ${MINERU_TIMEOUT_SECONDS:-120}
+      MINIO_UPLOAD_URL: ${MINIO_UPLOAD_URL:-}
+      MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY:-}
+      MINIO_SECRET_KEY: ${MINIO_SECRET_KEY:-}
+      MINIO_PUBLIC_POLICY_BUCKET: ${MINIO_PUBLIC_POLICY_BUCKET:-}
+      MINIO_ENDPOINT: ${MINIO_ENDPOINT:-}
+    volumes:
+      - storage-data:/app/storage
+    ports:
+      - "${API_PORT:-8000}:8000"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health/ready', timeout=2)"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+      start_period: 45s
+
+  web:
+    build:
+      context: .
+      dockerfile: web/Dockerfile
+    restart: unless-stopped
+    depends_on:
+      api:
+        condition: service_healthy
+    ports:
+      - "${WEB_PORT:-8080}:80"
+
+  mock-mineru:
+    build:
+      context: .
+      dockerfile: deploy/mock/mineru/Dockerfile
+    profiles: ["mocks"]
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=2)"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  mock-llm:
+    build:
+      context: .
+      dockerfile: deploy/mock/llm/Dockerfile
+    profiles: ["mocks"]
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=2)"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+volumes:
+  mysql-data:
+  redis-data:
+  storage-data:

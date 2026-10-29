@@ -1,0 +1,29 @@
+# 由 scripts/compile_python_lock.py 生成；请勿手工编辑。
+# 包含根包与 document-review-core 的运行时依赖及源码构建工具。
+fastapi>=0.110
+uvicorn[standard]>=0.27
+python-multipart>=0.0.9
+pydantic>=2.6
+pydantic-settings>=2.2
+sqlalchemy[asyncio]>=2.0.27
+alembic>=1.13
+aiomysql>=0.2.0
+PyMySQL[rsa]>=1.1
+aiosqlite>=0.20
+redis>=5.0
+langgraph>=1.0
+langchain-core>=1.0
+langchain-openai>=1.0
+jsonschema>=4.21
+PyMuPDF>=1.24
+Pillow>=10.0
+structlog>=24.1
+tenacity>=8.2
+httpx>=0.27
+pydantic>=2.6,<3
+jsonschema>=4.21,<5
+Pillow>=10
+langchain-core>=1.0,<2
+langchain-openai>=1.0,<2
+setuptools>=68
+wheel
