@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "document-review-core"
+version = "0.2.0"
+description = "可嵌入的通用文档取证与规则审核引擎"
+requires-python = ">=3.12"
+readme = "README.md"
+license = { text = "MIT" }
+dependencies = [
+  "pydantic>=2.6,<3",
+  "jsonschema>=4.21,<5",
+  "PyMuPDF>=1.24",
+  "Pillow>=10",
+  "langchain-core>=1.0,<2",
+  "langchain-openai>=1.0,<2",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["document_review*"]

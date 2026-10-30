@@ -1,0 +1,31 @@
+# 版本控制与本地运行产物
+.git
+.gitignore
+.venv
+venv
+__pycache__
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+web/node_modules/
+web/dist/
+web/tsconfig.tsbuildinfo
+storage/
+local.db
+*.db
+
+# 本地敏感配置：镜像和构建上下文不允许携带
+.env
+.env.*
+!.env.example
+!.env.docker.example
+
+# 本地验证资料与运行输出不进入镜像构建上下文
+**/*报告*/
+runs/
+
+# 可选本地数据与调试脚本不进入默认平台镜像
+app/seed/data/
+app/seed/sample*.py
+scripts/run_sample*.py
