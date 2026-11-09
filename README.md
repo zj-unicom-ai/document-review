@@ -194,6 +194,12 @@ npm run dev
 - MinerU-compatible PDF 解析接口
 - OpenAI-compatible LLM API
 
+## 模型配置
+用户使用的时候需要自行配置LLM模型，如果需要使用图片理解能力，需要配置多模型模型
+
+推荐模型服务平台：UniRouter [UniRouter 联通词元平台 →](https://www.uni-router.net/)
+**更优惠的模型API调用·各类模型灵活路由·按需充值与自定义模型**
+
 ## 授权
 
 本项目自身代码采用 [MIT License](LICENSE)
@@ -203,4 +209,4 @@ npm run dev
 镜像或提供相关网络服务前，必须自行确认并履行所选授权路径的义务。详见
 [NOTICE](NOTICE.md)。
 
-特别鸣谢 [UniRouter 联通词元平台 →](https://www.uni-router.net/)
+
