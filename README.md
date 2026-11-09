@@ -195,9 +195,9 @@ npm run dev
 - OpenAI-compatible LLM API
 
 ## 模型配置
-用户使用的时候需要自行配置LLM模型，如果需要使用图片理解能力，需要配置多模型模型
+用户使用的时候需要自行配置LLM模型，如果需要使用图片理解能力，需要配置多模态模型
 
-推荐模型服务平台：UniRouter [UniRouter 联通词元平台 →](https://www.uni-router.net/)
+推荐模型服务平台：[UniRouter 联通词元平台 →](https://www.uni-router.net/)
 **更优惠的模型API调用·各类模型灵活路由·按需充值与自定义模型**
 
 ## 授权
