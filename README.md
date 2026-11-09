@@ -202,3 +202,5 @@ npm run dev
 `AGPL-3.0` 或 `Artifex Commercial License` 双授权。分发包含 PyMuPDF 的软件、
 镜像或提供相关网络服务前，必须自行确认并履行所选授权路径的义务。详见
 [NOTICE](NOTICE.md)。
+
+特别鸣谢 [UniRouter 联通词元平台 →](https://www.uni-router.net/)
